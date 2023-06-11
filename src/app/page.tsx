@@ -41,7 +41,7 @@ export default function Home() {
     }
     if(window.ethereum){
       window.web3 = new Web3(window.ethereum)
-      const signature = await window.web3.eth.personal.sign(
+      const signature: string = await window.web3.eth.personal.sign(
         encryptedMessage,
         accounts[0]
       );
