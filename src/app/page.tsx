@@ -1,16 +1,36 @@
 "use client"
 import Web3 from 'web3'
+import { ethers } from "ethers";
 import CryptoJS from 'crypto-js'
 import { useEffect, useState } from 'react'
+import contractABI from '../constants/abi.json'
+
+interface Credentials{
+  website: string,
+  username: string,
+  password: string,
+  en_password: string,
+  en_username: string,
+}
 
 export default function Home() {
   const [domReady, setDomReady] = useState(false)
   const [connected, setConnected] = useState(false)
-  const [message, setMessage] = useState("")
+  const [credential, setCredential] = useState({
+    website: "",
+    username: "",
+    password: "",
+  })
+  const [en_credential, setEnCredential] = useState({
+    en_username: "",
+    en_password: "",
+  })
   const [passPhrase, setPassphrase] = useState("")
   const [encryptedMessage, setEncryptedMessage] = useState("")
   const [signature, setSignature] = useState("")
   const [accounts, setAccounts] = useState([])
+  const contractAddress = "0xc4C62aAE5eA3dE459Dd83A2Cc6BFdC33D53eFD41";
+  let contract: ethers.Contract | null = null;
 
   useEffect(() => {
     setDomReady(true)
@@ -18,21 +38,44 @@ export default function Home() {
 
   const connect = async () => {
     if(window.ethereum){
-      let account_arr = await window.ethereum.request({ method: 'eth_requestAccounts' })
-      setAccounts(account_arr)
-      setConnected(true)
-      console.log(accounts)
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      contract = new ethers.Contract(contractAddress, contractABI, signer);
+      console.log({signer, contract})
     }
     else{
       alert('No wallet found')
     }
   }
 
-  const encryptMessage = async (message: string) => {
-    let encryptedMessage = CryptoJS.AES.encrypt(message, passPhrase).toString()
-    setEncryptedMessage(encryptedMessage)
-    console.log({encryptedMessage})
+  const encryptMessage = async (credential: {
+    website: string,
+    username: string,
+    password: string,
+  }) => {
+    let en_username = CryptoJS.AES.encrypt(credential.username, passPhrase).toString()
+    let en_password = CryptoJS.AES.encrypt(credential.password, passPhrase).toString()
+    setEnCredential({en_username, en_password})
   }
+
+  const addCreds = async (e: any) => {
+    console.log("Contract call")
+    e.preventDefault();
+    if (contract) {
+      try {
+        const tx = await contract.addCredentials(
+          credential.website,
+          en_credential.en_username,
+          en_credential.en_password
+        );
+        await tx.wait();
+        console.log({ tx });
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  };
 
   const signMessage = async (encryptedMessage: string) => {
     if(accounts.length === 0){
@@ -70,9 +113,33 @@ export default function Home() {
           name="message"
           id="msg"
           className={`p-2 m-4 text-black border-2 border-black rounded`}
+          placeholder="website"
+          value={credential.website}
+          onChange={(e) =>
+            setCredential({ ...credential, website: e.target.value })
+          }
+        />
+        <input
+          type="text"
+          name="message"
+          id="msg"
+          className={`p-2 m-4 text-black border-2 border-black rounded`}
+          placeholder="username"
+          value={credential.username}
+          onChange={(e) =>
+            setCredential({ ...credential, username: e.target.value })
+          }
+        />
+        <input
+          type="text"
+          name="message"
+          id="msg"
+          className={`p-2 m-4 text-black border-2 border-black rounded`}
           placeholder="Message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          value={credential.password}
+          onChange={(e) =>
+            setCredential({ ...credential, password: e.target.value })
+          }
         />
         <input
           type="text"
@@ -87,7 +154,7 @@ export default function Home() {
         {/* encrypt message using AES-256 */}
         <button
           className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4`}
-          onClick={() => encryptMessage(message)}
+          onClick={() => encryptMessage(credential)}
         >
           Encrypt Message
         </button>
@@ -99,14 +166,28 @@ export default function Home() {
           name="passKey"
           id="key"
           className={`p-2 m-4 text-black border-2 border-black rounded`}
-          value={encryptedMessage}
+          value={en_credential.en_username}
           readOnly={true}
         />
+        <input
+          type="text"
+          name="passKey"
+          id="key"
+          className={`p-2 m-4 text-black border-2 border-black rounded`}
+          value={en_credential.en_password}
+          readOnly={true}
+        />
+        <button
+          className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4`}
+          onClick={(e) => addCreds(e)}
+        >
+          Add Credential
+        </button>
 
         {/* sign message using metamask */}
         <button
           className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4`}
-          onClick={() => signMessage(message)}
+          onClick={() => console.log("sign!")}
         >
           Sign Message
         </button>
