@@ -202,25 +202,6 @@ export default function Home() {
         >
           Add Credential
         </button>
-
-        {/* sign message using metamask */}
-        <button
-          className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4`}
-          onClick={() => console.log("sign!")}
-        >
-          Sign Message
-        </button>
-        <label htmlFor="encryptedMessage" className={`text-2xl`}>
-          Signed Message
-        </label>
-        <input
-          type="text"
-          name="passKey"
-          id="key"
-          className={`p-2 m-4 text-black border-2 border-black rounded`}
-          value={signature}
-          readOnly={true}
-        />
       </div>
     </div>
   );
