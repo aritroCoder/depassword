@@ -113,6 +113,19 @@ export default function Home() {
     }
   };
 
+  const decryptMessage = () => {
+    if (passPhrase && en_credential.en_username && en_credential.en_password) {
+      const decryptedUsername = CryptoJS.AES.decrypt(en_credential.en_username, passPhrase).toString(
+        CryptoJS.enc.Utf8
+      );
+      const decryptedPassword = CryptoJS.AES.decrypt(en_credential.en_password, passPhrase).toString(
+        CryptoJS.enc.Utf8
+      );
+      console.log('Decrypted Username:', decryptedUsername);
+      console.log('Decrypted Password:', decryptedPassword);
+    }
+  };
+
   return (
     <div>
       <h1 className={`text-6xl p-4`}>Home</h1>
@@ -202,6 +215,14 @@ export default function Home() {
         >
           Add Credential
         </button>
+      {/* decrypt message */}
+      <button
+          className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4`}
+          onClick={decryptMessage}
+        >
+          Decrypt Message
+        </button>
+
       </div>
     </div>
   );
