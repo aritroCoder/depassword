@@ -1,0 +1,80 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "merkleRoot",
+        "type": "bytes32"
+      }
+    ],
+    "name": "added_temp_credentials",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_website", "type": "string" },
+      { "internalType": "string", "name": "_username", "type": "string" },
+      { "internalType": "string", "name": "_password", "type": "string" }
+    ],
+    "name": "addCredentials",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes", "name": "_signature", "type": "bytes" }
+    ],
+    "name": "approveCredentials",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllCredentials",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "website", "type": "string" },
+          { "internalType": "string", "name": "username", "type": "string" },
+          { "internalType": "string", "name": "password", "type": "string" }
+        ],
+        "internalType": "struct PasswordManager.Credential[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_website", "type": "string" }
+    ],
+    "name": "getCredential",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "website", "type": "string" },
+          { "internalType": "string", "name": "username", "type": "string" },
+          { "internalType": "string", "name": "password", "type": "string" }
+        ],
+        "internalType": "struct PasswordManager.Credential",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "string", "name": "input", "type": "string" }],
+    "name": "makeHash",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "pure",
+    "type": "function"
+  }
+]
