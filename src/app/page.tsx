@@ -83,6 +83,12 @@ export default function Home() {
             try {
               let tx_approve = await contract.approveCredentials(signature);
               console.log(tx_approve);
+              const decryptedPassword = CryptoJS.AES.decrypt(
+                en_credential.en_password,
+                passPhrase
+              ).toString(CryptoJS.enc.Utf8);
+              //setting decryted password 
+              setDecryptedPassword(decryptedPassword);
             } catch (error) {
               console.log(error);
             }
