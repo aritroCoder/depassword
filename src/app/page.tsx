@@ -145,7 +145,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1 className={`text-6xl p-4`}>Home</h1>
+      <h1 className={`text-6xl p-4`}>DePassword</h1>
       <div className="flex flex-col items-center justify-center">
         {domReady && (
           <button
