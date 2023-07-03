@@ -24,7 +24,7 @@ export default function Home() {
   const [signature, setSignature] = useState("");
   const [accounts, setAccounts] = useState([]);
   const [contract, setContract] = useState<ethers.Contract | null>(null);
-  const contractAddress = "0xA2cF1A444f4aB42b02b1053D7d87540f3Bced6ef";
+  const contractAddress = "0x298626f6cc3831EF8B15Bcf41E87c119AC90fA66";
 
   useEffect(() => {
     setDomReady(true);
@@ -78,15 +78,13 @@ export default function Home() {
             // merkleRoot
           );
           console.log({ signature });
-          if(contract && signature){
-            console.log("Sign merkleroot")
+          if (contract && signature) {
+            console.log("Sign merkleroot");
             try {
-              let tx_approve = await contract.approveCredentials(
-                signature
-              );
-              console.log(tx_approve)
+              let tx_approve = await contract.approveCredentials(signature);
+              console.log(tx_approve);
             } catch (error) {
-              console.log(error)
+              console.log(error);
             }
           }
         });
@@ -97,89 +95,18 @@ export default function Home() {
       }
     }
   };
-  /*
 
-  const decryptPassword = async (website: any) => {
-    website.preventDefault();
-    if (contract && signer) {
-      console.log("Calling contract to decrypt");
-      try {
-        console.log("Calling get credential");
-        const credential = await contract.getCredential(website);
-        const { username, password } = credential;
-  
-        console.log("Calling verify function");
-        const isSignatureValid = await contract.verify(
-          signer.getAddress(),
-          credential.password,
-          signature
-        );
-  
-        if (!isSignatureValid) {
-          throw new Error("Invalid signature!");
-        }
-  
-        // Decrypt the password
-        
-              const decryptedPassword = CryptoJS.AES.decrypt(
-                password,
-                passPhrase
-              ).toString(CryptoJS.enc.Utf8);
-        
-              console.log("Decrypted Password:", decryptedPassword);
-      } catch (error) {
-        console.log(error)
-      }
-          
-      
-        
-      
-    } else {
-      console.log("Missing contract or signer object");
-    }
-  };*/
-  const decryptPassword = async (website:any) => {
+  const getAllCredentials = async (website: any) => {
     website.preventDefault();
     if (contract && signer) {
       console.log("Calling contract to decrypt");
       try {
         console.log("Calling getAllCredentials");
-        const credentials = await contract.getAllCredentials();
-        console.log("Credentials:", credentials);
-        console.log("Website:", website);
-  
-        // Find the credential for the given website
-        let credential;
-      for (let i = 0; i < credentials.length; i++) {
-        if (credentials[i].website === website) {
-          credential = credentials[i];
-          break;
-        }
-      }
-      console.log("Found Credential:", credential);
-  
-        if (!credential) {
-          throw new Error("Credential not found for the website!!!");
-        }
-  
-        console.log("Calling verify function");
-        const isSignatureValid = await contract.verify(
-          signer.getAddress(),
-          credential.password,
-          signature
-        );
-  
-        if (!isSignatureValid) {
-          throw new Error("Invalid signature!!!!");
-        }
-  
-        // Decrypt the password
-        const decryptedPassword = CryptoJS.AES.decrypt(
-          credential.password,
-          passPhrase
-        ).toString(CryptoJS.enc.Utf8);
-  
-        console.log("Decrypted Password:", decryptedPassword);
+        const tx = await contract.getAllCredentials();
+        contract.on("all_creds", (creds: any) => {
+          console.log({ creds });
+        });
+        await tx.wait();
       } catch (error) {
         console.log(error);
       }
@@ -187,40 +114,28 @@ export default function Home() {
       console.log("Missing contract or signer object");
     }
   };
-  
-  
-  
 
-  
-
-  const signMessage = async (encryptedMessage: string) => {
-    if (accounts.length === 0) {
-      alert("Please connect wallet first");
-      return;
-    }
-    if (window.ethereum) {
-      window.web3 = new Web3(window.ethereum);
-      const signature: string = await window.web3.eth.personal.sign(
-        encryptedMessage,
-        accounts[0]
-      );
-      console.log({ signature });
-      setSignature(signature);
+  const getCredential = async (website: any) => {
+    website.preventDefault();
+    if (contract && signer) {
+      console.log("Calling contract to decrypt");
+      try {
+        console.log("Calling getCredentials");
+        const tx = await contract.getCredential(credential.website);
+        contract.on(
+          "cred",
+          (website: string, username: string, password: string) => {
+            console.log({ website, username, password });
+          }
+        );
+        await tx.wait();
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log("Missing contract or signer object");
     }
   };
-
-  /*const decryptMessage = () => {
-    if (passPhrase && en_credential.en_username && en_credential.en_password) {
-      const decryptedUsername = CryptoJS.AES.decrypt(en_credential.en_username, passPhrase).toString(
-        CryptoJS.enc.Utf8
-      );
-      const decryptedPassword = CryptoJS.AES.decrypt(en_credential.en_password, passPhrase).toString(
-        CryptoJS.enc.Utf8
-      );
-      console.log('Decrypted Username:', decryptedUsername);
-      console.log('Decrypted Password:', decryptedPassword);
-    }
-  };*/
 
   return (
     <div>
@@ -311,11 +226,11 @@ export default function Home() {
         >
           Add Credential
         </button>
-      {/* decrypt message */}
-      
-      <button
+        {/* decrypt message */}
+
+        <button
           className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded m-4`}
-          onClick={(e) => decryptPassword(e)}
+          onClick={(e) => getCredential(e)}
         >
           Get Credential
         </button>
@@ -327,8 +242,6 @@ export default function Home() {
           value={decryptedPassword}
           readOnly={true}
         />
-
-
       </div>
     </div>
   );
